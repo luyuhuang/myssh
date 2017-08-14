@@ -8,13 +8,10 @@ set port [lindex $argv 3]
 
 spawn ssh -p $port $username@$servername
 expect {
-    "(yes/no)?" {
-        send "yes\n"
-        expect "password:"
-        send "$password\n"
-    }
-    "password:" {
-        send "$password\n"
-    }
+"*(yes/no)?" {send "yes\r"; exp_continue}
+"*password:" {send "$password\r"; exp_continue}
+"*\]*" {interact;}
+"*\$*" {interact;}
+"*\#*" {interact;}
 }
-interact
+exit
