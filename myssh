@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+source=$0
+while [ -h $source ]; do
+    dir=$(cd -P $(dirname $source) && pwd)
+    source=$(readlink $source)
+    [[ $source != /* ]] && source=$dir"/"$source
+done
+
+dir="$(cd -P $(dirname $source) && pwd)"
+config_file=$dir"/config"
+
+create() {
+    if [ ! -e "$config_file" ]; then
+        echo "# name username password host port" > $config_file
+        echo "# example: example_server root 123456 192.168.1.101 22" >> $config_file
+    fi
+}
+
+enter() {
+    i=0
+    list=()
+    menu=()
+
+    while read line; do
+        if [ -z "$line" ]; then continue; fi
+        if [ "${line:0:1}" = "#" ]; then continue; fi
+
+        array=($line)
+        list[$i]=$line
+
+        desc=${array[0]}
+        username=${array[1]}
+        password=${array[2]}
+        host=${array[3]}
+        port=${array[4]}
+
+        menu[$i]="$((i+1)) ${desc}(${username}@${host})"
+
+        ((i++))
+    done < $dir"/config"
+
+    if [ ${#list[*]} -lt 1 ]; then
+        edit
+        exit 0
+    fi
+
+    ((width=$(tput cols)/2))
+    ((height=$(tput lines)/2))
+    choose=$(whiptail --menu '' --title "MySSH" 0 0 0 ${menu[*]} 3>&1 1>&2 2>&3)
+    if [ -z "$choose" ]; then exit 0; fi
+    clear
+
+    array=(${list[$(($choose-1))]})
+    desc=${array[0]}
+    username=${array[1]}
+    password=${array[2]}
+    host=${array[3]}
+    port=${array[4]}
+
+    echo "Connect $desc($username@$host)..."
+    $dir"/_ssh" $username $host $password $port
+}
+
+edit() {
+    vi $config_file
+}
+
+list() {
+    cat $config_file
+}
+
+create
+case $1 in
+    -h)
+        echo "usage $0 [-h][-l][-e]"
+        ;;
+    -l)
+        list
+        ;;
+    -e)
+        edit
+        ;;
+    "")
+        enter
+        ;;
+    *)
+        echo "usage $0 [-h][-l][-e]"
+        ;;
+esac
+
