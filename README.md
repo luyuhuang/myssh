@@ -1,6 +1,8 @@
 # MySSH
 A tool that make you to use SSH more gracefully
 
+![screenshot](screenshot.png)
+
 ### Install
 Create a symbolic link in /usr/local/bin to point to the myssh script
 
