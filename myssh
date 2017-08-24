@@ -97,6 +97,10 @@ copy() {
 
     text=$(whiptail --inputbox 'Usage: ORIGIN_PATH {<<,>>} LOCAL_PATH' --title "MySSH-copy" 0 0 3>&1 1>&2 2>&3)
 
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+
     if echo $text | grep '>>' >/dev/null 2>&1; then
         origin_path=$(echo $text | awk -F '>>' '{print$1}')
         local_path=$(echo $text | awk -F '>>' '{print$2}')
