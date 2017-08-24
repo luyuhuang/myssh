@@ -14,3 +14,10 @@ sudo ln -s /home/$(whoami)/myssh/myssh /usr/local/bin/myssh
 ```
 
 enjoy it!
+
+### Usage
+#### SSH to remove host:
+![ssh](myssh-ssh.gif)
+
+#### Copy file from remove host:
+![scp](myssh-scp.gif)
