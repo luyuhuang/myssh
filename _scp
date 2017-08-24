@@ -1,0 +1,14 @@
+#!/usr/bin/expect
+
+set timeout 60
+set password [lindex $argv 0]
+set port [lindex $argv 1]
+set src [lindex $argv 2]
+set dest [lindex $argv 3]
+
+spawn scp -P $port -r $src $dest
+expect {
+"*(yes/no)?" {send "yes\r"; exp_continue}
+"*password:" {send "$password\r"; exp_continue}
+}
+exit

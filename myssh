@@ -17,7 +17,7 @@ create() {
     fi
 }
 
-enter() {
+show_menu() {
     i=0
     list=()
     menu=()
@@ -41,25 +41,80 @@ enter() {
     done < $dir"/config"
 
     if [ ${#list[*]} -lt 1 ]; then
-        edit
-        exit 0
+        return 1
     fi
 
     ((width=$(tput cols)/2))
     ((height=$(tput lines)/2))
     choose=$(whiptail --menu '' --title "MySSH" 0 0 0 ${menu[*]} 3>&1 1>&2 2>&3)
-    if [ -z "$choose" ]; then exit 0; fi
-    clear
 
-    array=(${list[$(($choose-1))]})
+    if [ -z "$choose" ]; then
+        return 2
+    else
+        array=(${list[$(($choose-1))]})
+        echo ${array[*]}
+        return 0
+    fi
+}
+
+enter() {
+    array=($(show_menu))
+    res=$?
+    if [ $res -eq 1 ]; then
+        edit
+        exit 0
+    elif [ $res -eq 2 ]; then
+        exit 1
+    fi
+
     desc=${array[0]}
     username=${array[1]}
     password=${array[2]}
     host=${array[3]}
     port=${array[4]}
 
+    clear
+
     echo "Connect $desc($username@$host)..."
     $dir"/_ssh" $username $host $password $port
+}
+
+copy() {
+    array=($(show_menu))
+    res=$?
+    if [ $res -eq 1 ]; then
+        edit
+        exit 0
+    elif [ $res -eq 2 ]; then
+        exit 1
+    fi
+
+    desc=${array[0]}
+    username=${array[1]}
+    password=${array[2]}
+    host=${array[3]}
+    port=${array[4]}
+
+    text=$(whiptail --inputbox 'Usage: ORIGIN_PATH {<<,>>} LOCAL_PATH' --title "MySSH-copy" 0 0 3>&1 1>&2 2>&3)
+
+    if echo $text | grep '>>' >/dev/null 2>&1; then
+        origin_path=$(echo $text | awk -F '>>' '{print$1}')
+        local_path=$(echo $text | awk -F '>>' '{print$2}')
+
+        src="$username@$host:$origin_path"
+        dest="$local_path"
+    elif echo $text | grep '<<' >/dev/null 2>&1; then
+        origin_path=$(echo $text | awk -F '<<' '{print$1}')
+        local_path=$(echo $text | awk -F '<<' '{print$2}')
+        
+        src="$local_path"
+        dest="$username@$host:$origin_path"
+    else
+        echo "Illegal input"
+        exit 1
+    fi
+
+    $dir"/_scp" $password $port $src $dest
 }
 
 edit() {
@@ -70,10 +125,22 @@ list() {
     cat $config_file
 }
 
+show_help() {
+    cat <<EOF
+usage $0 [-h][-l][-e][-c]
+
+options:
+    -h  print help
+    -l  print config file
+    -e  edit config file
+    -c  copy file
+EOF
+}
+
 create
 case $1 in
     -h)
-        echo "usage $0 [-h][-l][-e]"
+        show_help
         ;;
     -l)
         list
@@ -81,11 +148,14 @@ case $1 in
     -e)
         edit
         ;;
+    -c)
+        copy
+        ;;
     "")
         enter
         ;;
     *)
-        echo "usage $0 [-h][-l][-e]"
+        show_help
         ;;
 esac
 
