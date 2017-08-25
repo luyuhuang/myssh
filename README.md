@@ -17,15 +17,15 @@ enjoy it!
 
 ### Usage
 
-enter myssh:         myssh
+enter myssh:        `myssh`
 
-print help:          myssh -h
+print help:         `myssh -h`
 
-print config file:   myssh -l
+print config file:  `myssh -l`
 
-edit config file:    myssh -e
+edit config file:   `myssh -e`
 
-copy file:           myssh -c
+copy file:          `myssh -c`
 
 
 #### SSH to remove host:
