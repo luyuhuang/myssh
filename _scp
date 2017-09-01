@@ -1,6 +1,6 @@
 #!/usr/bin/expect
 
-set timeout 60
+set timeout -1
 set password [lindex $argv 0]
 set port [lindex $argv 1]
 set src [lindex $argv 2]
