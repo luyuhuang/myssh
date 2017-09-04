@@ -9,6 +9,6 @@ set dest [lindex $argv 3]
 spawn scp -P $port -r $src $dest
 expect {
 "*(yes/no)?" {send "yes\r"; exp_continue}
-"*password:" {send "$password\r"; exp_continue}
+"*assword:" {send "$password\r"; exp_continue}
 }
 exit
