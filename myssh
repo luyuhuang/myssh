@@ -35,7 +35,7 @@ show_menu() {
         host=${array[3]}
         port=${array[4]}
 
-        menu[$i]="$((i+1)) ${desc}(${username}@${host})"
+        menu[$i]="$((i+1)) ${desc}[${username}@${host}]"
 
         ((i++))
     done < $dir"/config"
@@ -46,7 +46,8 @@ show_menu() {
 
     ((width=$(tput cols)/2))
     ((height=$(tput lines)/2))
-    choose=$(whiptail --menu '' --title "MySSH" 0 0 0 ${menu[*]} 3>&1 1>&2 2>&3)
+    #choose=$(whiptail --menu '' --title "MySSH" 0 0 0 ${menu[*]} 3>&1 1>&2 2>&3)
+    choose=$(dialog --title "MySSH" --menu "" 0 0 0 ${menu[*]} 3>&1 1>&2 2>&3)
 
     if [ -z "$choose" ]; then
         return 2
@@ -95,7 +96,8 @@ copy() {
     host=${array[3]}
     port=${array[4]}
 
-    text=$(whiptail --inputbox 'Usage: ORIGIN_PATH {<<,>>} LOCAL_PATH' --title "MySSH-copy" 0 0 3>&1 1>&2 2>&3)
+    #text=$(whiptail --inputbox 'Usage: ORIGIN_PATH {<<,>>} LOCAL_PATH' --title "MySSH-copy" 0 0 3>&1 1>&2 2>&3)
+    text=$(dialog --title "MySSH-copy" --inputbox 'Usage: ORIGIN_PATH {<<,>>} LOCAL_PATH' 0 0 3>&1 1>&2 2>&3)
 
     if [ $? -ne 0 ]; then
         exit 1
@@ -131,7 +133,7 @@ list() {
 
 show_help() {
     cat <<EOF
-usage $0 [-h][-l][-e][-c]
+usage myssh [-h][-l][-e][-c]
 
 options:
     -h  print help
