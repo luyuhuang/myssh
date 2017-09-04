@@ -6,7 +6,7 @@ A tool that make you to use SSH more gracefully
 ### Install
 Open terminal then copy and execute this command to auto install:
 ```bash
-wget -qO- https://raw.github.com/luyuhuang/myssh/setup.sh | sh
+wget -qO- https://raw.githubusercontent.com/luyuhuang/myssh/master/setup.sh | sh
 ```
 
 ### Usage
