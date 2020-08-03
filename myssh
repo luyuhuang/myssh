@@ -128,7 +128,11 @@ edit() {
 }
 
 list() {
-    cat $config_file
+    if [ -n "$1" ]; then
+        cat $config_file
+    else
+        cat $config_file | awk '{for(i=1;i<=NF;++i)if($0!~/^\s*#/&&i==3)printf"****** ";else printf$i" ";print""}'
+    fi
 }
 
 show_help() {
@@ -138,18 +142,20 @@ usage myssh [-h][-l][-e][-c]
 options:
     -h  print help
     -l  print config file
+    -L  print config file and show password
     -e  edit config file
     -c  copy file
 EOF
+    exit 1
 }
 
 create
 case $1 in
-    -h)
-        show_help
-        ;;
     -l)
         list
+        ;;
+    -L)
+        list show-pass
         ;;
     -e)
         edit
