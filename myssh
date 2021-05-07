@@ -112,7 +112,7 @@ copy() {
     elif echo $text | grep '<<' >/dev/null 2>&1; then
         origin_path=$(echo $text | awk -F '<<' '{print$1}')
         local_path=$(echo $text | awk -F '<<' '{print$2}')
-        
+
         src="$local_path"
         dest="$username@$host:$origin_path"
     else
@@ -127,6 +127,21 @@ edit() {
     vi $config_file
 }
 
+add() {
+    if [ $# -gt 0 ]; then
+        echo "$*" >> $config_file
+    else
+        read -p 'name: ' name
+        read -p 'username: ' username
+        read -sp 'password: ' password
+        echo
+        read -p 'host: ' host
+        read -p 'port (default 22): ' port
+
+        echo "$name $username $password $host ${port:-22}" >> $config_file
+    fi
+}
+
 list() {
     if [ -n "$1" ]; then
         cat $config_file
@@ -137,7 +152,8 @@ list() {
 
 show_help() {
     cat <<EOF
-usage myssh [-h][-l][-e][-c]
+usage myssh [-h] [-l] [-L] [-e] [-c]
+            [-a [NAME USERNAME PASSWORD HOST PORT]]
 
 options:
     -h  print help
@@ -145,6 +161,7 @@ options:
     -L  print config file and show password
     -e  edit config file
     -c  copy file
+    -a  add a session
 EOF
     exit 1
 }
@@ -159,6 +176,10 @@ case $1 in
         ;;
     -e)
         edit
+        ;;
+    -a)
+        args=($*)
+        add ${args[@]:1}
         ;;
     -c)
         copy
