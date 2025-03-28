@@ -1,13 +1,6 @@
 #!/usr/bin/env bash
 
-source=$0
-while [ -h $source ]; do
-    dir=$(cd -P $(dirname $source) && pwd)
-    source=$(readlink $source)
-    [[ $source != /* ]] && source=$dir"/"$source
-done
-
-dir="$(cd -P $(dirname $source) && pwd)"
+dir=$(dirname $(realpath "$0"))
 config_file=$dir"/config"
 
 create() {
@@ -38,7 +31,7 @@ show_menu() {
         menu[$i]="$((i+1)) ${desc}[${username}@${host}]"
 
         ((i++))
-    done < $dir"/config"
+    done < $config_file
 
     if [ ${#list[*]} -lt 1 ]; then
         return 1
